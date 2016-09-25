@@ -1,48 +1,67 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
-#define MAX 1000
-struct pilha
-{
-    int t;      /* t é o topo da pilha -- proximo espaco vazio do vetor */
-    int v[MAX]; /* v é o vetor que armazena os elementos da pilha */
+
+/* Define um novo tipo de dado chamado Pilha que Ã© um ponteiro para "struct pilha". */
+typedef struct node * link;
+
+struct node{
+    char item;
+    link next;
 };
 
-/* Define um novo tipo de dado chamado Pilha que é um ponteiro para "struct pilha". */
-typedef struct pilha * Pilha;
+typedef struct {
+    link t;      /* t Ã© o topo da pilha -- proximo espaco vazio do vetor */
+    //int v[MAX]; /* v Ã© o vetor que armazena os elementos da pilha */
+} * Pilha;
 
-/* Aloca espaço para armazenar uma nova Pilha */
-Pilha novaPilha () {
+/* Aloca espaÃ§o para armazenar uma nova Pilha */
+Pilha novaPilha(){
     Pilha p = malloc(sizeof(*p));
-    if (p == NULL)
-        {
-            printf("Algum erro aconteceu !\n");
-            exit(-1);
-        }
-    p->t = 0; /* devemos inicializar o topo com 0 */
+    if (p == NULL){
+        printf("Algum erro aconteceu !\n");
+        exit(-1);
+    }
+    p->t = NULL; /* devemos inicializar o topo com 0 */
     return p;
 }
-/* Libera memória de uma dada pilha p */
-void destroiPilha (Pilha p)
-{
+/* Libera memÃ³ria de uma dada pilha p */
+void destroiPilha (Pilha p){
+    while(p!= NULL){
+        pop(p);
+    }
     free(p);
 }
-/* Operação de inserir novo elemento na pilha */
-void push (Pilha p, int valor) {
-    p->v[(p->t)++] = valor;
+/* OperaÃ§Ã£o de inserir novo elemento na pilha */
+void push (Pilha p, int valor){
+    link a = malloc(sizeof *a);
+    if (a == NULL){
+        printf ("Erro no malloc \n");
+        exit(-1);
+    }
+    a->item = valor;
+    a->next = p->t;
+    p->t = a;
 }
-/* Operação de remover um elemento da pilha */
+/* OperaÃ§Ã£o de remover um elemento da pilha */
 int pop (Pilha p) {
-    return p->v[--(p->t)];
+    link a = p->t;
+    if(p->t == NULL){
+        printf("Algum erro aconteceu !\n");
+        exit(-1);
+    }
+    int x = p->t->item;
+    p->t = p->t->next;
+    free(a);
+    return x;
 }
-/* Operação para pegar o elemento do topo da pilha */
-int topo (Pilha p) {
-    return p->v[p->t - 1];
+int topo (Pilha p){
+    return p->t->item;
 }
-/* Transforma a notação infixa para a notação posfixa */
-int infixoParaPosfixo (char * entrada, char * saida, int n)
-{
-    Pilha p = novaPilha();
+
+/* Transforma a notaÃ§Ã£o infixa para a notaÃ§Ã£o posfixa */
+int infixoParaPosfixo (char * entrada, char * saida, int n){
+   Pilha p = novaPilha();
     int i,k ;
     int j = 0;
     char c;
@@ -105,20 +124,16 @@ int bemEncaixado (char* s) {
     int resultado = 1;
     for(i = 0; s[i] != '\0'; i++) {
         if(s[i] == '(') {
-            if(p->t >= MAX) {
-                resultado = 0;
-                break;
-            }
             push(p, 1);
         } else if (s[i] == ')') {
-            if(p->t <= 0) {
+            if(p->t == NULL) {
                 resultado = 0;
                 break;
             }
             pop(p);
         }
     }
-    if(p->t > 0)
+    if(p->t != NULL)
         resultado = 0;
     destroiPilha(p);
     return resultado;
@@ -165,16 +180,15 @@ int calcula ( char * s ) {
 }
 
 
-
-/* Exemplo de utilização */
+/* Exemplo de utilizaÃ§Ã£o */
 int main () {
-    char infixo[255] ;
+    char infixo[255];
     char posfixo[255];
     printf("Sou uma calculadora de inteiros implementado com pilha!\n");
     printf("Digite quit para sair !\n");
     printf ("> ");
-    while(fgets(infixo, 255, stdin) != NULL) {
-        if(strcmp(infixo, "quit\n") == 0)  {
+    while(fgets(infixo, 255, stdin) != NULL){
+        if(strcmp(infixo, "quit\n") == 0) {
             printf ("morri !\n");
             return 0;
         }
